@@ -11,9 +11,13 @@
     <div class="app-shell">
       <aside class="sidebar" aria-label="Thread controls">
         <div class="brand">
-          <div class="brand-mark" aria-hidden="true">S</div>
+          <label id="profileAvatar" class="brand-mark" aria-label="Change profile thumbnail">
+            <span id="profileAvatarVisual">S</span>
+            <input id="profileImageInput" type="file" accept="image/*" hidden>
+          </label>
           <div>
-            <h1>Sam's Notes</h1>
+            <button id="profileTitle" class="profile-name-button" type="button">Sam's Notes</button>
+            <input id="profileNameInput" class="profile-name-input" type="text" autocomplete="off" hidden>
           </div>
         </div>
 
@@ -43,7 +47,7 @@
         <div class="toolbar">
           <div>
             <h2>Threads</h2>
-            <p id="activeFileLabel">Threads are stored as JSON files in threads/</p>
+            <p id="activeFileLabel"></p>
           </div>
           <div class="toolbar-actions">
             <button id="collapseAllButton" type="button">Collapse All</button>
@@ -65,7 +69,14 @@
         <header class="thread-header">
           <button class="thread-toggle" type="button" aria-expanded="false">
             <span class="chevron" aria-hidden="true">›</span>
-            <span class="first-message"></span>
+            <span class="thread-preview">
+              <span class="thread-author">
+                <span class="thread-avatar" aria-hidden="true"></span>
+                <span class="thread-author-name"></span>
+              </span>
+              <span class="first-message"></span>
+              <span class="first-message-images"></span>
+            </span>
           </button>
           <div class="thread-meta">
             <time class="thread-updated"></time>
@@ -96,6 +107,12 @@
 
     <template id="messageTemplate">
       <div class="message">
+        <div class="message-author" hidden>
+          <div class="message-avatar" aria-hidden="true"></div>
+          <div class="message-author-copy">
+            <div class="message-author-name"></div>
+          </div>
+        </div>
         <div class="message-content">
           <div class="message-text"></div>
           <textarea class="message-input auto-grow" rows="3" hidden></textarea>

@@ -1,0 +1,45 @@
+# Python runtime/cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments and local Python tooling
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node/package manager noise if tooling is added later
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment/secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Generated macOS launcher bundle
+Sam's Notes.app/
+
+# Keep note data and attachments trackable for backup:
+#   threads/
+#   assets/

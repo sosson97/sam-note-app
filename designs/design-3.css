@@ -47,7 +47,8 @@ body {
 
 .toolbar,
 .thread-list {
-  max-width: 900px;
+  width: min(60vw, 900px);
+  max-width: 100%;
 }
 
 .thread-list {
@@ -114,4 +115,11 @@ body::after {
   color: var(--accent);
   font-size: 0.78rem;
   font-weight: 700;
+}
+
+@media (max-width: 780px) {
+  .toolbar,
+  .thread-list {
+    width: 100%;
+  }
 }

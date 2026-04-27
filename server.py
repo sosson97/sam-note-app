@@ -15,6 +15,7 @@ from urllib.parse import unquote, urlparse
 ROOT = Path(__file__).resolve().parent
 THREAD_DIR = ROOT / "threads"
 ASSET_DIR = ROOT / "assets"
+PROFILE_PATH = ROOT / "profile.json"
 HOST = "127.0.0.1"
 PORT = 5173
 DESIGN = "1"
@@ -59,6 +60,25 @@ def normalize_thread(data: dict) -> dict:
     return data
 
 
+def default_profile() -> dict:
+    return {"name": "Sam's Notes", "imageUrl": ""}
+
+
+def normalize_profile(data: dict) -> dict:
+    if not isinstance(data, dict):
+        raise ValueError("Profile must be an object")
+
+    name = data.get("name", default_profile()["name"])
+    image_url = data.get("imageUrl", "")
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("Profile name is required")
+    if not isinstance(image_url, str):
+        raise ValueError("Profile image URL must be a string")
+    if image_url and not image_url.startswith("/assets/"):
+        raise ValueError("Profile image must be a local asset")
+    return {"name": name.strip(), "imageUrl": image_url}
+
+
 def safe_asset_name(name: str) -> str:
     if not re.fullmatch(r"[A-Za-z0-9._-]+", name):
         raise ValueError("Invalid asset name")
@@ -85,6 +105,9 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/threads":
             self.send_threads()
             return
+        if parsed.path == "/api/profile":
+            self.send_profile()
+            return
         if parsed.path == "/design.css":
             self.send_design_css()
             return
@@ -94,6 +117,9 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/api/threads":
             self.create_thread()
+            return
+        if parsed.path == "/api/profile":
+            self.update_profile()
             return
         if parsed.path == "/api/assets":
             self.create_asset()
@@ -159,6 +185,15 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def send_profile(self) -> None:
+        if PROFILE_PATH.exists():
+            try:
+                self.send_json({"profile": normalize_profile(read_json(PROFILE_PATH))})
+                return
+            except (json.JSONDecodeError, ValueError):
+                pass
+        self.send_json({"profile": default_profile()})
+
     def create_thread(self) -> None:
         try:
             thread = normalize_thread(self.read_body())
@@ -192,6 +227,16 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
         with path.open("wb") as file:
             file.write(self.rfile.read(length))
         self.send_json({"url": f"/assets/{filename}", "name": filename}, HTTPStatus.CREATED)
+
+    def update_profile(self) -> None:
+        try:
+            profile = normalize_profile(self.read_body())
+            with PROFILE_PATH.open("w", encoding="utf-8") as file:
+                json.dump(profile, file, indent=2, ensure_ascii=False)
+                file.write("\n")
+            self.send_json({"profile": profile})
+        except (json.JSONDecodeError, ValueError) as error:
+            self.send_error(HTTPStatus.BAD_REQUEST, str(error))
 
     def update_thread(self, thread_id: str) -> None:
         try:

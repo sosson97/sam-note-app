@@ -63,13 +63,15 @@ input {
   position: sticky;
   top: 0;
   z-index: 5;
-  max-width: 1180px;
+  width: min(60vw, 1180px);
+  max-width: 100%;
   padding: 10px 0;
   background: var(--background);
 }
 
 .thread-list {
-  max-width: 1180px;
+  width: min(60vw, 1180px);
+  max-width: 100%;
   gap: 8px;
 }
 
@@ -126,5 +128,10 @@ body::after {
   .sidebar {
     position: static;
     height: auto;
+  }
+
+  .toolbar,
+  .thread-list {
+    width: 100%;
   }
 }

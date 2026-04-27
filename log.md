@@ -51,3 +51,14 @@
 - Added `Shift+Enter` in reply textareas as a shortcut to submit the reply.
 - Added edit-mode keyboard shortcuts: `Shift+Enter` saves the edited message and `Esc` cancels the edit.
 - Added `.gitignore` for Python caches, editor files, local env files, package-manager noise, and temporary files while keeping `threads/` and `assets/` trackable for backup.
+- Added `Shift+Enter` in the new-thread textarea as a shortcut for the Create button.
+- Added a macOS launcher app bundle at `Sam's Notes.app` that starts `server.py` if needed and opens `http://localhost:5173`.
+- Installed the launcher to `/Users/sam.son/Applications/Sam's Notes.app`, verified the bundle plist and executable bit, launched it once, and confirmed `http://127.0.0.1:5173/` responds.
+- Added `app-icon.png` as the source app icon, generated `AppIcon.icns`, and wired it into `Sam's Notes.app`.
+- Added `Sam's Notes.app/` to `.gitignore` so the generated macOS launcher bundle is not committed.
+- Added a file-backed profile at `profile.json` so the sidebar name and thumbnail can be changed from the app.
+- Changed collapsed thread previews to show the full first message text and any first-message images instead of truncating to one line.
+- Added the profile thumbnail and name above the first message in each thread to make the first post read like an authored note.
+- Replaced the separate profile edit controls with direct interactions: click the sidebar thumbnail to change the image and click the sidebar name to edit it.
+- Added the profile thumbnail and name to the main collapsed thread preview while keeping author identity only on the first expanded message.
+- Fixed hidden author rows so profile avatars appear only on the first expanded message, removed the persistent file-storage label, and narrowed the thread column to 60% of the display on desktop.

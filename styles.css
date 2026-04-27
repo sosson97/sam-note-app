@@ -103,9 +103,26 @@ input {
   background: var(--accent);
   color: #fff;
   font-weight: 800;
+  overflow: hidden;
+  flex: 0 0 auto;
 }
 
-.brand h1,
+.brand-mark img,
+.message-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#profileAvatarVisual {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.profile-name-button,
 .toolbar h2,
 .empty-state h2,
 .dialog-content h2 {
@@ -113,8 +130,29 @@ input {
   letter-spacing: 0;
 }
 
-.brand h1 {
+.profile-name-button {
+  width: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 4px;
+  padding: 2px 0;
+  background: transparent;
+  color: var(--ink);
   font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.profile-name-button:hover {
+  color: var(--accent);
+}
+
+.profile-name-input {
+  height: 32px;
+  min-width: 0;
+  padding: 0 8px;
+  font-weight: 800;
 }
 
 .brand p,
@@ -137,6 +175,10 @@ input {
   grid-template-columns: 1fr;
   gap: 8px;
   margin-bottom: 24px;
+}
+
+.brand-mark {
+  cursor: pointer;
 }
 
 .primary-button {
@@ -186,7 +228,8 @@ input {
   align-items: center;
   gap: 18px;
   margin: 0 auto 20px;
-  max-width: 980px;
+  width: min(60vw, 980px);
+  max-width: 100%;
 }
 
 .toolbar-actions {
@@ -198,7 +241,8 @@ input {
   display: grid;
   gap: 12px;
   margin: 0 auto;
-  max-width: 980px;
+  width: min(60vw, 980px);
+  max-width: 100%;
 }
 
 .thread {
@@ -217,14 +261,14 @@ input {
 
 .thread-header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   min-height: 64px;
 }
 
 .thread-toggle {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 8px;
   min-width: 0;
   flex: 1;
@@ -233,6 +277,7 @@ input {
   border-radius: 0;
   background: transparent;
   text-align: left;
+  padding-block: 12px;
 }
 
 .thread-toggle:hover {
@@ -251,17 +296,80 @@ input {
 
 .first-message {
   min-width: 0;
+  font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.thread-preview {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.thread-author {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.thread-avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
   overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.thread-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thread-author-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 700;
+}
+
+.first-message-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.first-message-images:empty {
+  display: none;
+}
+
+.first-message-images img {
+  width: 96px;
+  height: 72px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  object-fit: cover;
 }
 
 .thread-meta {
   display: flex;
   align-items: center;
+  align-self: flex-start;
   gap: 8px;
-  padding-right: 12px;
+  padding: 14px 12px 0 0;
   white-space: nowrap;
 }
 
@@ -322,6 +430,46 @@ input {
   grid-template-columns: minmax(0, 1fr) max-content;
   gap: 12px;
   align-items: start;
+}
+
+.message-author {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.message-author[hidden] {
+  display: none;
+}
+
+.message-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.message-author-copy {
+  min-width: 0;
+}
+
+.message-author-name {
+  overflow: hidden;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.first-thread-message {
+  row-gap: 8px;
 }
 
 .message-content {
@@ -579,6 +727,15 @@ dialog::backdrop {
 
   .toolbar-actions {
     flex-wrap: wrap;
+  }
+
+  .thread-header {
+    display: grid;
+  }
+
+  .thread-meta {
+    justify-content: flex-start;
+    padding: 0 12px 12px 40px;
   }
 
   .message {

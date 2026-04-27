@@ -1,11 +1,18 @@
 const API_BASE = "/api/threads";
 const ASSET_API = "/api/assets";
+const PROFILE_API = "/api/profile";
+const DEFAULT_PROFILE = {
+  name: "Sam's Notes",
+  imageUrl: "",
+};
 
 const state = {
   threads: [],
+  profile: { ...DEFAULT_PROFILE },
   expandedThreadIds: new Set(),
   saveTimers: new Map(),
   savingThreadIds: new Set(),
+  savingProfile: false,
   activePasteTarget: null,
   error: "",
 };
@@ -29,6 +36,10 @@ const elements = {
   threadTemplate: document.querySelector("#threadTemplate"),
   threadTextInput: document.querySelector("#threadTextInput"),
   messageCount: document.querySelector("#messageCount"),
+  profileAvatar: document.querySelector("#profileAvatarVisual"),
+  profileImageInput: document.querySelector("#profileImageInput"),
+  profileNameInput: document.querySelector("#profileNameInput"),
+  profileTitle: document.querySelector("#profileTitle"),
 };
 
 const newThreadFiles = [];
@@ -69,6 +80,16 @@ function normalizeThread(thread) {
             updatedAt: message.updatedAt || message.createdAt || now,
           }))
       : [],
+  };
+}
+
+function normalizeProfile(profile) {
+  return {
+    name:
+      typeof profile?.name === "string" && profile.name.trim()
+        ? profile.name.trim()
+        : DEFAULT_PROFILE.name,
+    imageUrl: typeof profile?.imageUrl === "string" ? profile.imageUrl : DEFAULT_PROFILE.imageUrl,
   };
 }
 
@@ -259,6 +280,80 @@ function renderMessageImages(container, message) {
   });
 }
 
+function renderFirstMessageImages(container, message) {
+  container.replaceChildren();
+  if (!message.images.length) {
+    return;
+  }
+
+  message.images.forEach((image) => {
+    const thumbnail = document.createElement("img");
+    thumbnail.src = image.url;
+    thumbnail.alt = image.name || "Attached image";
+    container.append(thumbnail);
+  });
+}
+
+function renderAvatar(container, profile) {
+  container.replaceChildren();
+  container.style.backgroundImage = "";
+  if (profile.imageUrl) {
+    const image = document.createElement("img");
+    image.src = profile.imageUrl;
+    image.alt = "";
+    container.append(image);
+    return;
+  }
+  const fallback = document.createElement("span");
+  fallback.textContent = profile.name.slice(0, 1).toUpperCase();
+  container.append(fallback);
+}
+
+function renderProfile() {
+  const profile = state.profile;
+  document.title = profile.name;
+  elements.profileTitle.textContent = profile.name;
+  elements.profileNameInput.value = profile.name;
+  elements.profileTitle.hidden = false;
+  elements.profileNameInput.hidden = true;
+  renderAvatar(elements.profileAvatar, profile);
+}
+
+async function loadProfile() {
+  try {
+    const data = await requestJson(PROFILE_API);
+    state.profile = normalizeProfile(data.profile);
+    renderProfile();
+  } catch (error) {
+    state.profile = { ...DEFAULT_PROFILE };
+    console.error(error);
+    renderProfile();
+  }
+}
+
+async function saveProfile(nextProfile) {
+  state.error = "";
+  state.savingProfile = true;
+  updateStorageStatus();
+
+  try {
+    const saved = await requestJson(PROFILE_API, {
+      method: "POST",
+      body: JSON.stringify(nextProfile),
+    });
+    state.profile = normalizeProfile(saved.profile);
+    renderProfile();
+    render();
+  } catch (error) {
+    state.error = "The profile could not be saved.";
+    console.error(error);
+    render();
+  } finally {
+    state.savingProfile = false;
+    updateStorageStatus();
+  }
+}
+
 async function loadThreads() {
   try {
     state.error = "";
@@ -349,15 +444,17 @@ function updateStorageStatus() {
     return;
   }
 
-  if (state.savingThreadIds.size > 0) {
+  if (state.savingThreadIds.size > 0 || state.savingProfile) {
     if (elements.storageStatus) {
       elements.storageStatus.textContent = "Saving";
     }
-    elements.activeFileLabel.textContent = "Writing changes to threads/";
+    elements.activeFileLabel.textContent = state.savingProfile
+      ? "Writing profile changes to profile.json"
+      : "Writing changes to threads/";
     return;
   }
 
-  elements.activeFileLabel.textContent = "Threads are stored as JSON files in threads/";
+  elements.activeFileLabel.textContent = "";
 }
 
 function updateStats() {
@@ -418,6 +515,9 @@ function renderThread(thread) {
   const toggle = fragment.querySelector(".thread-toggle");
   const body = fragment.querySelector(".thread-body");
   const firstMessage = fragment.querySelector(".first-message");
+  const firstMessageImages = fragment.querySelector(".first-message-images");
+  const threadAvatar = fragment.querySelector(".thread-avatar");
+  const threadAuthorName = fragment.querySelector(".thread-author-name");
   const updated = fragment.querySelector(".thread-updated");
   const total = fragment.querySelector(".message-total");
   const messages = fragment.querySelector(".messages");
@@ -430,13 +530,16 @@ function renderThread(thread) {
   root.classList.toggle("expanded", expanded);
   body.hidden = !expanded;
   toggle.setAttribute("aria-expanded", String(expanded));
+  threadAuthorName.textContent = state.profile.name;
+  renderAvatar(threadAvatar, state.profile);
   firstMessage.textContent = thread.messages[0].text || (thread.messages[0].images.length ? "Image note" : "Untitled thread");
+  renderFirstMessageImages(firstMessageImages, thread.messages[0]);
   updated.dateTime = thread.updatedAt;
   updated.textContent = formatDate(thread.updatedAt);
   total.textContent = `${thread.messages.length} ${thread.messages.length === 1 ? "message" : "messages"}`;
 
-  thread.messages.forEach((message) => {
-    messages.append(renderMessage(thread, message));
+  thread.messages.forEach((message, index) => {
+    messages.append(renderMessage(thread, message, index === 0));
   });
 
   toggle.addEventListener("click", () => {
@@ -504,9 +607,12 @@ function renderThread(thread) {
   return fragment;
 }
 
-function renderMessage(thread, message) {
+function renderMessage(thread, message, isFirstMessage = false) {
   const fragment = document.querySelector("#messageTemplate").content.cloneNode(true);
   const root = fragment.querySelector(".message");
+  const author = fragment.querySelector(".message-author");
+  const avatar = fragment.querySelector(".message-avatar");
+  const authorName = fragment.querySelector(".message-author-name");
   const text = fragment.querySelector(".message-text");
   const input = fragment.querySelector(".message-input");
   const images = fragment.querySelector(".message-images");
@@ -521,6 +627,13 @@ function renderMessage(thread, message) {
 
   const editFiles = [];
   bindImagePaste(root, editFiles, editPendingImages);
+
+  if (isFirstMessage) {
+    root.classList.add("first-thread-message");
+    author.hidden = false;
+    authorName.textContent = state.profile.name;
+    renderAvatar(avatar, state.profile);
+  }
 
   text.textContent = message.text;
   input.value = message.text;
@@ -623,6 +736,7 @@ function renderThreadHeader(thread) {
   }
   root.querySelector(".first-message").textContent =
     thread.messages[0].text || (thread.messages[0].images.length ? "Image note" : "Untitled thread");
+  renderFirstMessageImages(root.querySelector(".first-message-images"), thread.messages[0]);
 }
 
 function openNewThreadDialog() {
@@ -635,6 +749,53 @@ function openNewThreadDialog() {
 }
 
 function bindEvents() {
+  const saveProfileName = () => {
+    const name = elements.profileNameInput.value.trim();
+    elements.profileTitle.hidden = false;
+    elements.profileNameInput.hidden = true;
+    if (!name || name === state.profile.name) {
+      elements.profileNameInput.value = state.profile.name;
+      return;
+    }
+    saveProfile({ ...state.profile, name });
+  };
+
+  elements.profileTitle.addEventListener("click", () => {
+    elements.profileNameInput.value = state.profile.name;
+    elements.profileTitle.hidden = true;
+    elements.profileNameInput.hidden = false;
+    elements.profileNameInput.focus();
+    elements.profileNameInput.select();
+  });
+  elements.profileNameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      saveProfileName();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      elements.profileNameInput.value = state.profile.name;
+      elements.profileTitle.hidden = false;
+      elements.profileNameInput.hidden = true;
+    }
+  });
+  elements.profileNameInput.addEventListener("blur", saveProfileName);
+  elements.profileImageInput.addEventListener("change", async () => {
+    const file = elements.profileImageInput.files?.[0];
+    elements.profileImageInput.value = "";
+    if (!file || !file.type.startsWith("image/")) {
+      return;
+    }
+    try {
+      const image = await uploadImage(file);
+      await saveProfile({ ...state.profile, imageUrl: image.url });
+    } catch (error) {
+      state.error = "The profile thumbnail could not be saved.";
+      console.error(error);
+      render();
+    }
+  });
   elements.newThreadButton.addEventListener("click", openNewThreadDialog);
   elements.emptyNewThreadButton.addEventListener("click", openNewThreadDialog);
   elements.reloadButton.addEventListener("click", loadThreads);
@@ -644,6 +805,13 @@ function bindEvents() {
     elements.threadImageInput.value = "";
   });
   bindImagePaste(elements.threadDialog, newThreadFiles, elements.threadPendingImages);
+  elements.threadTextInput.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || !event.shiftKey) {
+      return;
+    }
+    event.preventDefault();
+    elements.createThreadButton.click();
+  });
   document.addEventListener("paste", (event) => {
     if (event.defaultPrevented || !state.activePasteTarget) {
       return;
@@ -686,4 +854,5 @@ function bindEvents() {
 }
 
 bindEvents();
+loadProfile();
 loadThreads();
