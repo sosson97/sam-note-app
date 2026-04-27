@@ -1,0 +1,148 @@
+/*
+  Design 1: Dense warm workspace.
+  Combines design 2's compact scanning layout with design 3's warmer color scheme.
+*/
+
+:root {
+  --background: #f7f3ec;
+  --surface: #fffdf8;
+  --surface-muted: #eee5d8;
+  --ink: #24211d;
+  --muted: #756c60;
+  --line: #d9cab8;
+  --accent: #8a4b2b;
+  --accent-strong: #6f3b21;
+  --danger: #a33a2a;
+  --shadow: none;
+}
+
+body {
+  font-size: 14px;
+}
+
+.app-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 16px;
+  background: #fff9ef;
+}
+
+.brand {
+  margin-bottom: 18px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+}
+
+.file-actions,
+.search-field {
+  margin-bottom: 14px;
+}
+
+button {
+  min-height: 34px;
+  border-radius: 6px;
+  padding: 0 10px;
+}
+
+input {
+  height: 36px;
+}
+
+.primary-button {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.primary-button:hover {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+}
+
+.workspace {
+  padding: 18px;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  max-width: 1180px;
+  padding: 10px 0;
+  background: var(--background);
+}
+
+.thread-list {
+  max-width: 1180px;
+  gap: 8px;
+}
+
+.thread {
+  border-radius: 6px;
+}
+
+.thread-header,
+.thread-toggle {
+  min-height: 46px;
+}
+
+.thread-toggle {
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.thread-toggle:hover {
+  background: #fff7eb;
+}
+
+.thread-body {
+  padding: 10px 14px 14px;
+  background: #fffaf1;
+}
+
+.messages {
+  gap: 6px;
+}
+
+.message-text {
+  padding: 2px 0;
+}
+
+.message-image {
+  max-height: 220px;
+}
+
+.composer {
+  padding: 8px;
+  background: #fffdf8;
+}
+
+body::after {
+  content: "Design 1";
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 10;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(255, 253, 248, 0.9);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+@media (max-width: 780px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+}

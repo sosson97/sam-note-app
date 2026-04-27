@@ -1,0 +1,117 @@
+/*
+  Design 3: Focused reading view.
+  Warmer page, wider breathing room inside expanded threads, and stronger message hierarchy.
+*/
+
+:root {
+  --background: #f7f3ec;
+  --surface: #fffdf8;
+  --surface-muted: #eee5d8;
+  --ink: #24211d;
+  --muted: #756c60;
+  --line: #d9cab8;
+  --accent: #8a4b2b;
+  --accent-strong: #6f3b21;
+  --danger: #a33a2a;
+  --shadow: 0 16px 44px rgba(78, 58, 38, 0.12);
+}
+
+body {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.54), transparent 38%),
+    var(--background);
+}
+
+.app-shell {
+  grid-template-columns: 300px minmax(0, 1fr);
+}
+
+.sidebar {
+  background: #fff9ef;
+}
+
+.brand-mark,
+.primary-button {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.primary-button:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.workspace {
+  padding: 38px 30px;
+}
+
+.toolbar,
+.thread-list {
+  max-width: 900px;
+}
+
+.thread-list {
+  gap: 16px;
+}
+
+.thread {
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.thread-header,
+.thread-toggle {
+  min-height: 72px;
+}
+
+.first-message {
+  font-size: 1.02rem;
+}
+
+.thread-body {
+  padding: 22px;
+  background: #fffaf1;
+}
+
+.messages {
+  gap: 16px;
+}
+
+.message {
+  padding: 8px 0 14px;
+  border-bottom: 1px solid rgba(217, 202, 184, 0.62);
+}
+
+.message:last-child {
+  border-bottom: 0;
+}
+
+.message-text {
+  font-size: 1.02rem;
+  line-height: 1.58;
+}
+
+.message-image {
+  max-width: min(560px, 100%);
+  max-height: 360px;
+}
+
+.composer {
+  padding: 14px;
+  background: #fffdf8;
+}
+
+body::after {
+  content: "Design 3";
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 10;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(255, 253, 248, 0.9);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+}

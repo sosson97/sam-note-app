@@ -1,0 +1,53 @@
+# Log
+
+- Created a static browser-based thread note app with `index.html`, `styles.css`, and `app.js`.
+- Added collapsible thread rows that show the first message at the top level and expand to reveal the full thread.
+- Added create, edit, reply, delete-message, and delete-thread workflows.
+- Added search, expand-all, collapse-all, and thread/message counters.
+- Added local draft persistence through `localStorage`.
+- Added file open/save support for JSON note files through the browser File System Access API, with download/upload fallback where direct file writing is unavailable.
+- Added `notes.json` as a sample local note file.
+- Verified `app.js` with `node --check app.js`.
+- Reworked persistence away from browser `localStorage` and File System Access API.
+- Added `server.py`, a local Python HTTP server with JSON API endpoints for thread files.
+- Changed the app to load, create, update, and delete threads through `/api/threads`.
+- Added `threads/` as the project-local storage directory, with one JSON file per thread.
+- Added `threads/welcome-thread.json` as a file-backed sample thread.
+- Removed the old single-file `notes.json` sample to avoid confusion with the new per-thread file model.
+- Verified `app.js` with `node --check app.js` and `server.py` with `python3 -m py_compile server.py`.
+- Smoke-tested `python3 server.py` at `http://localhost:5173`, verified `/api/threads` returns the sample thread, verified `/` serves `index.html`, then shut the server down.
+- Diagnosed failed thread creation caused by running `python3 -m http.server`, which does not support the app's POST API.
+- Replaced the static server on port 5173 with `python3 server.py`, verified POST creates a thread file, and deleted the temporary smoke-test thread.
+- Improved the create-thread error message when the app is accidentally served by a static server.
+- Changed thread messages to render as read-only text by default, with explicit Edit, Save, and Cancel controls before a message can be modified.
+- Restyled message Edit/Save/Cancel/Delete controls as small underlined text buttons and removed the white message background.
+- Created 20 sample thread files named `sample-thread-01.json` through `sample-thread-20.json` under `threads/` for visual testing.
+- Changed message actions to appear only on hover/focus on desktop and removed the fixed read-only message height so one-line messages only take one line.
+- Reserved right-side action space for both read-only and editing message layouts so edit textareas no longer overlap Save/Cancel/Delete controls.
+- Replaced the fixed-padding message layout with a responsive two-column grid so message content and hover actions cannot overlap at different viewport widths.
+- Added `codex.md` with a project design principle to make UI changes work across display sizes.
+- Added image attachment support. Images upload through `POST /api/assets`, are stored under `assets/`, and message JSON stores image URLs in an `images` array.
+- Added image pickers for new threads, replies, and message edits, plus thumbnail rendering for attached images.
+- Changed thread, reply, and edit textareas to auto-grow with content instead of becoming internally scrollable.
+- Restarted `python3 server.py`, smoke-tested `POST /api/assets` with a tiny PNG upload, and removed the temporary upload artifact.
+- Added image paste support. Users can press paste while focused in the new-thread, reply, or edit textareas, or click the new Paste image buttons to attach clipboard images where the browser permits clipboard reads.
+- Added `assets/example-thread-image.png` and `threads/example-image-thread.json` as an example thread with an attached image.
+- Hardened clipboard image parsing for paste items that do not provide a file object.
+- Removed explicit Paste image buttons. Clipboard image attachment now follows the Slack-like flow: focus a textarea, press Cmd+V/Ctrl+V, preview the image, then submit.
+- Styled the reply composer as one bordered box containing the reply text, pasted image previews, and actions.
+- Made pending pasted/selected images more visible with larger preview tiles inside the composer and an explicit Attached image label.
+- Broadened clipboard image handling to read from both `clipboardData.files` and `clipboardData.items`, with a document-level fallback for the active composer.
+- Deduplicated pasted images when browsers expose the same clipboard image through both files and items.
+- Reduced the reply composer textarea's default height so pending image previews appear closer to the cursor after paste.
+- Tightened paste deduplication to use clipboard image type and size, stopped paste propagation after handling an image, and changed reply textareas to start at one row.
+- Changed pending preview rendering to use `FileReader` data URLs instead of object URLs and added an explicit Image ready to attach status above pending images.
+- Browser-tested the pending image preview path in Chrome with a temporary localhost test script; verified the actual reply composer shows `Paste preview test passed: 1 preview(s)`, then removed the temporary test script.
+- Added three selectable design variants. `python3 server.py` uses design 1, while `python3 server.py 2` and `python3 server.py 3` serve alternate CSS from `/design.css`.
+- Restarted the local server with `python3 server.py 2` and verified `/design.css` serves the dense operator-view design.
+- Updated design 1 to combine design 2's dense scanning layout with design 3's warm color scheme.
+- Renamed the app from `Thread Notes` to `Sam's Notes` and removed the sidebar `File backed` status line.
+- Changed thread deletion from an X icon to a hover-only text `Delete` action.
+- Added each thread's last modified time to the main thread row and added client-side modified-descending sorting after loads/saves.
+- Added `Shift+Enter` in reply textareas as a shortcut to submit the reply.
+- Added edit-mode keyboard shortcuts: `Shift+Enter` saves the edited message and `Esc` cancels the edit.
+- Added `.gitignore` for Python caches, editor files, local env files, package-manager noise, and temporary files while keeping `threads/` and `assets/` trackable for backup.

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sam's Notes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="design.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Thread controls">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">S</div>
+          <div>
+            <h1>Sam's Notes</h1>
+          </div>
+        </div>
+
+        <div class="file-actions" aria-label="File actions">
+          <button id="newThreadButton" class="primary-button" type="button">New Thread</button>
+          <button id="reloadButton" type="button">Reload Files</button>
+        </div>
+
+        <label class="search-field">
+          <span>Search</span>
+          <input id="searchInput" type="search" placeholder="Thread title or message">
+        </label>
+
+        <div class="stats" aria-label="Note statistics">
+          <div>
+            <strong id="threadCount">0</strong>
+            <span>threads</span>
+          </div>
+          <div>
+            <strong id="messageCount">0</strong>
+            <span>messages</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <div class="toolbar">
+          <div>
+            <h2>Threads</h2>
+            <p id="activeFileLabel">Threads are stored as JSON files in threads/</p>
+          </div>
+          <div class="toolbar-actions">
+            <button id="collapseAllButton" type="button">Collapse All</button>
+            <button id="expandAllButton" type="button">Expand All</button>
+          </div>
+        </div>
+
+        <section id="threadList" class="thread-list" aria-live="polite"></section>
+        <section id="emptyState" class="empty-state" hidden>
+          <h2>No threads yet</h2>
+          <p>Create a thread to start writing notes in a conversation-style format.</p>
+          <button id="emptyNewThreadButton" class="primary-button" type="button">New Thread</button>
+        </section>
+      </main>
+    </div>
+
+    <template id="threadTemplate">
+      <article class="thread">
+        <header class="thread-header">
+          <button class="thread-toggle" type="button" aria-expanded="false">
+            <span class="chevron" aria-hidden="true">›</span>
+            <span class="first-message"></span>
+          </button>
+          <div class="thread-meta">
+            <time class="thread-updated"></time>
+            <span class="message-total"></span>
+            <button class="delete-thread" type="button">Delete</button>
+          </div>
+        </header>
+        <div class="thread-body" hidden>
+          <div class="messages"></div>
+          <form class="reply-form">
+            <div class="composer">
+              <textarea class="reply-input auto-grow" rows="1" placeholder="Add a reply"></textarea>
+              <div class="pending-images"></div>
+              <div class="composer-actions">
+                <div class="composer-tools">
+                  <label class="text-link-button">
+                    Add image
+                    <input class="reply-image-input" type="file" accept="image/*" multiple hidden>
+                  </label>
+                </div>
+                <button class="primary-button" type="submit">Reply</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </article>
+    </template>
+
+    <template id="messageTemplate">
+      <div class="message">
+        <div class="message-content">
+          <div class="message-text"></div>
+          <textarea class="message-input auto-grow" rows="3" hidden></textarea>
+          <div class="message-images"></div>
+          <div class="edit-image-row" hidden>
+            <div class="composer-tools">
+              <label class="text-link-button">
+                Add image
+                <input class="edit-image-input" type="file" accept="image/*" multiple hidden>
+              </label>
+            </div>
+            <div class="edit-pending-images pending-images"></div>
+          </div>
+        </div>
+        <div class="message-actions">
+          <time></time>
+          <button class="edit-message" type="button">Edit</button>
+          <button class="save-message" type="button" hidden>Save</button>
+          <button class="cancel-edit-message" type="button" hidden>Cancel</button>
+          <button class="delete-message" type="button">Delete</button>
+        </div>
+      </div>
+    </template>
+
+    <dialog id="threadDialog">
+      <form method="dialog" class="dialog-content">
+        <h2>New Thread</h2>
+        <textarea id="threadTextInput" class="auto-grow" rows="5" placeholder="Write the first message"></textarea>
+        <div id="threadPendingImages" class="pending-images"></div>
+        <div class="composer-tools">
+          <label class="text-link-button">
+            Add image
+            <input id="threadImageInput" type="file" accept="image/*" multiple hidden>
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button id="cancelThreadButton" type="button">Cancel</button>
+          <button id="createThreadButton" class="primary-button" type="submit">Create</button>
+        </div>
+      </form>
+    </dialog>
+    <script src="app.js"></script>
+  </body>
+</html>
