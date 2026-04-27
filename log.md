@@ -62,3 +62,7 @@
 - Replaced the separate profile edit controls with direct interactions: click the sidebar thumbnail to change the image and click the sidebar name to edit it.
 - Added the profile thumbnail and name to the main collapsed thread preview while keeping author identity only on the first expanded message.
 - Fixed hidden author rows so profile avatars appear only on the first expanded message, removed the persistent file-storage label, and narrowed the thread column to 60% of the display on desktop.
+- Added fenced code block rendering for messages using triple backticks, with optional language labels and horizontally scrollable code.
+- Added automatic hyperlink highlighting for `http://`, `https://`, and `www.` links in normal message text while leaving code blocks unchanged.
+- Added Markdown-style bullet and numbered list rendering for normal message text using `- `, `* `, `1. `, or `1) ` prefixes.
+- Changed numbered list rendering to preserve the explicit number typed on each line instead of auto-numbering list items.

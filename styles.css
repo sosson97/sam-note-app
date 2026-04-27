@@ -482,8 +482,67 @@ input {
   border-radius: 8px;
   background: transparent;
   line-height: 1.45;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.message-text-fragment {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.message-list {
+  margin: 6px 0;
+  padding-left: 1.35rem;
+}
+
+.message-list li {
+  margin: 2px 0;
+  padding-left: 0.1rem;
+}
+
+.message-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.message-link:hover {
+  color: var(--accent-strong);
+}
+
+.code-block {
+  max-width: 100%;
+  margin: 8px 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #24211d;
+  color: #f8efe2;
+}
+
+.code-block figcaption {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 6px 10px;
+  color: #d9cab8;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.code-block pre {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.code-block code {
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  white-space: pre;
 }
 
 .message-input {

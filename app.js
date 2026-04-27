@@ -280,6 +280,144 @@ function renderMessageImages(container, message) {
   });
 }
 
+function appendTextFragment(container, text) {
+  if (!text) {
+    return;
+  }
+  appendListAwareText(container, text);
+}
+
+function appendLinkedText(container, text) {
+  const urlPattern = /\b((?:https?:\/\/|www\.)[^\s<>"']+)/gi;
+  let cursor = 0;
+  let match = urlPattern.exec(text);
+
+  while (match) {
+    container.append(document.createTextNode(text.slice(cursor, match.index)));
+    const rawUrl = match[0];
+    const trimmedUrl = rawUrl.replace(/[),.;!?]+$/, "");
+    const trailingText = rawUrl.slice(trimmedUrl.length);
+    const link = document.createElement("a");
+    link.className = "message-link";
+    link.href = trimmedUrl.startsWith("www.") ? `https://${trimmedUrl}` : trimmedUrl;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = trimmedUrl;
+    container.append(link);
+    if (trailingText) {
+      container.append(document.createTextNode(trailingText));
+    }
+    cursor = match.index + rawUrl.length;
+    match = urlPattern.exec(text);
+  }
+
+  container.append(document.createTextNode(text.slice(cursor)));
+}
+
+function appendParagraph(container, lines) {
+  if (!lines.length) {
+    return;
+  }
+  const paragraph = document.createElement("span");
+  paragraph.className = "message-text-fragment";
+  appendLinkedText(paragraph, lines.join("\n"));
+  container.append(paragraph);
+}
+
+function appendList(container, type, items) {
+  if (!items.length) {
+    return;
+  }
+  const list = document.createElement(type === "ol" ? "ol" : "ul");
+  list.className = "message-list";
+  items.forEach((itemData) => {
+    const item = document.createElement("li");
+    if (type === "ol") {
+      item.value = itemData.value;
+    }
+    appendLinkedText(item, itemData.text);
+    list.append(item);
+  });
+  container.append(list);
+}
+
+function appendListAwareText(container, text) {
+  const lines = text.split("\n");
+  let paragraphLines = [];
+  let listType = null;
+  let listItems = [];
+
+  const flushParagraph = () => {
+    appendParagraph(container, paragraphLines);
+    paragraphLines = [];
+  };
+  const flushList = () => {
+    appendList(container, listType, listItems);
+    listType = null;
+    listItems = [];
+  };
+
+  lines.forEach((line) => {
+    const unordered = line.match(/^\s*[-*]\s+(.+)$/);
+    const ordered = line.match(/^\s*(\d+)[.)]\s+(.+)$/);
+    const nextListType = ordered ? "ol" : unordered ? "ul" : null;
+
+    if (!nextListType) {
+      flushList();
+      paragraphLines.push(line);
+      return;
+    }
+
+    flushParagraph();
+    if (listType && listType !== nextListType) {
+      flushList();
+    }
+    listType = nextListType;
+    listItems.push(
+      ordered
+        ? { value: Number.parseInt(ordered[1], 10), text: ordered[2] }
+        : { text: unordered[1] },
+    );
+  });
+
+  flushList();
+  flushParagraph();
+}
+
+function appendCodeBlock(container, language, codeText) {
+  const block = document.createElement("figure");
+  const pre = document.createElement("pre");
+  const code = document.createElement("code");
+
+  block.className = "code-block";
+  if (language) {
+    const label = document.createElement("figcaption");
+    label.textContent = language;
+    block.append(label);
+  }
+  code.textContent = codeText.replace(/\n$/, "");
+  pre.append(code);
+  block.append(pre);
+  container.append(block);
+}
+
+function renderFormattedText(container, value) {
+  container.replaceChildren();
+  const text = value || "";
+  const fencePattern = /```([^\n`]*)\n?([\s\S]*?)```/g;
+  let cursor = 0;
+  let match = fencePattern.exec(text);
+
+  while (match) {
+    appendTextFragment(container, text.slice(cursor, match.index));
+    appendCodeBlock(container, match[1].trim(), match[2]);
+    cursor = match.index + match[0].length;
+    match = fencePattern.exec(text);
+  }
+
+  appendTextFragment(container, text.slice(cursor));
+}
+
 function renderFirstMessageImages(container, message) {
   container.replaceChildren();
   if (!message.images.length) {
@@ -635,7 +773,7 @@ function renderMessage(thread, message, isFirstMessage = false) {
     renderAvatar(avatar, state.profile);
   }
 
-  text.textContent = message.text;
+  renderFormattedText(text, message.text);
   input.value = message.text;
   time.dateTime = message.updatedAt;
   time.textContent = formatDate(message.updatedAt);
