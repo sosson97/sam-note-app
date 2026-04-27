@@ -4,7 +4,6 @@ import json
 import mimetypes
 import posixpath
 import re
-import sys
 import uuid
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -18,12 +17,7 @@ ASSET_DIR = ROOT / "assets"
 PROFILE_PATH = ROOT / "profile.json"
 HOST = "127.0.0.1"
 PORT = 5173
-DESIGN = "1"
-DESIGN_FILES = {
-    "1": ROOT / "designs" / "design-1.css",
-    "2": ROOT / "designs" / "design-2.css",
-    "3": ROOT / "designs" / "design-3.css",
-}
+DESIGN_CSS = ROOT / "designs" / "design-1.css"
 ALLOWED_IMAGE_TYPES = {
     "image/gif": ".gif",
     "image/jpeg": ".jpg",
@@ -177,8 +171,7 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
         self.send_json({"threads": threads})
 
     def send_design_css(self) -> None:
-        path = DESIGN_FILES.get(DESIGN, DESIGN_FILES["1"])
-        body = path.read_bytes()
+        body = DESIGN_CSS.read_bytes()
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "text/css; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -261,17 +254,10 @@ class ThreadNotesHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    global DESIGN
-    if len(sys.argv) > 1:
-        DESIGN = sys.argv[1]
-    if DESIGN not in DESIGN_FILES:
-        valid = ", ".join(sorted(DESIGN_FILES))
-        raise SystemExit(f"Unknown design '{DESIGN}'. Choose one of: {valid}")
-
     THREAD_DIR.mkdir(exist_ok=True)
     ASSET_DIR.mkdir(exist_ok=True)
     server = ThreadingHTTPServer((HOST, PORT), ThreadNotesHandler)
-    print(f"Serving Thread Notes at http://localhost:{PORT} with design {DESIGN}")
+    print(f"Serving Sam's Notes at http://localhost:{PORT}")
     print(f"Thread files: {THREAD_DIR}")
     server.serve_forever()
 

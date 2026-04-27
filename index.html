@@ -9,7 +9,7 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar" aria-label="Thread controls">
+      <aside id="appSidebar" class="sidebar" aria-label="Thread controls">
         <div class="brand">
           <label id="profileAvatar" class="brand-mark" aria-label="Change profile thumbnail">
             <span id="profileAvatarVisual">S</span>
@@ -50,8 +50,15 @@
             <p id="activeFileLabel"></p>
           </div>
           <div class="toolbar-actions">
-            <button id="collapseAllButton" type="button">Collapse All</button>
-            <button id="expandAllButton" type="button">Expand All</button>
+            <button id="sidebarToggleButton" class="icon-button sidebar-toggle-button" type="button" aria-controls="appSidebar" aria-expanded="true" aria-label="Hide sidebar" title="Hide sidebar">
+              <span aria-hidden="true">◧</span>
+            </button>
+            <button id="collapseAllButton" class="icon-button thread-control-button" type="button" aria-label="Collapse all threads" title="Collapse all threads">
+              <span aria-hidden="true">▴</span>
+            </button>
+            <button id="expandAllButton" class="icon-button thread-control-button" type="button" aria-label="Expand all threads" title="Expand all threads">
+              <span aria-hidden="true">▾</span>
+            </button>
           </div>
         </div>
 

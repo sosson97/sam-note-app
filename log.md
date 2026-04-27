@@ -66,3 +66,9 @@
 - Added automatic hyperlink highlighting for `http://`, `https://`, and `www.` links in normal message text while leaving code blocks unchanged.
 - Added Markdown-style bullet and numbered list rendering for normal message text using `- `, `* `, `1. `, or `1) ` prefixes.
 - Changed numbered list rendering to preserve the explicit number typed on each line instead of auto-numbering list items.
+- Added a toolbar control to collapse or restore the left sidebar, with the preference saved in browser local storage.
+- Fixed the app to the design-1 theme, removed the alternate design stylesheets and command-line design selection, and removed the visible `Design 1` badge.
+- Replaced the text sidebar toggle with a compact icon button that updates its accessible label and tooltip when collapsed or expanded.
+- Replaced the `Collapse All` and `Expand All` toolbar text buttons with compact icon buttons and accessible labels.
+- Moved each message timestamp and edit/delete controls into a right-side action column on desktop while keeping mobile actions below the message.
+- Kept the right-side message action column active on narrow screens so timestamp/edit/delete placement stays consistent across widths.

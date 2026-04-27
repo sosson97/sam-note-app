@@ -81,6 +81,10 @@ input {
   min-height: 100vh;
 }
 
+body.sidebar-collapsed .app-shell {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .sidebar {
   border-right: 1px solid var(--line);
   background: #fbfaf7;
@@ -234,6 +238,7 @@ input {
 
 .toolbar-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -388,6 +393,26 @@ input {
   font-size: 1.2rem;
 }
 
+.sidebar-toggle-button {
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.thread-control-button {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.thread-control-button:hover {
+  color: var(--accent);
+}
+
+body.sidebar-collapsed .sidebar-toggle-button span {
+  transform: scaleX(-1);
+}
+
 .delete-message {
   color: var(--danger);
 }
@@ -427,14 +452,15 @@ input {
 
 .message {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
 }
 
 .message-author {
   display: flex;
-  grid-column: 1 / -1;
+  grid-column: 1;
+  grid-row: 1;
   align-items: center;
   gap: 10px;
   min-width: 0;
@@ -473,6 +499,8 @@ input {
 }
 
 .message-content {
+  grid-column: 1;
+  grid-row: 2;
   min-width: 0;
 }
 
@@ -608,9 +636,13 @@ input {
 
 .message-actions {
   display: flex;
+  grid-column: 2;
+  grid-row: 1 / span 2;
   align-items: baseline;
   justify-content: flex-end;
   gap: 8px;
+  justify-self: end;
+  padding-top: 4px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 120ms ease;
@@ -765,6 +797,10 @@ dialog::backdrop {
     grid-template-columns: 1fr;
   }
 
+  body.sidebar-collapsed .app-shell {
+    grid-template-columns: 1fr;
+  }
+
   .sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--line);
@@ -775,8 +811,7 @@ dialog::backdrop {
   }
 
   .toolbar,
-  .reply-form,
-  .message {
+  .reply-form {
     grid-template-columns: 1fr;
   }
 
@@ -798,13 +833,20 @@ dialog::backdrop {
   }
 
   .message {
-    grid-template-columns: 1fr;
-    gap: 4px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
   }
 
-  .message-actions {
-    justify-content: flex-start;
-    opacity: 1;
-    pointer-events: auto;
+  .message-author,
+  .message-content {
+    grid-column: 1;
+  }
+
+  .message-author {
+    grid-row: 1;
+  }
+
+  .message-content {
+    grid-row: 2;
   }
 }

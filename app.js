@@ -1,6 +1,7 @@
 const API_BASE = "/api/threads";
 const ASSET_API = "/api/assets";
 const PROFILE_API = "/api/profile";
+const SIDEBAR_COLLAPSED_KEY = "sams-notes-sidebar-collapsed";
 const DEFAULT_PROFILE = {
   name: "Sam's Notes",
   imageUrl: "",
@@ -27,6 +28,8 @@ const elements = {
   newThreadButton: document.querySelector("#newThreadButton"),
   reloadButton: document.querySelector("#reloadButton"),
   searchInput: document.querySelector("#searchInput"),
+  sidebar: document.querySelector("#appSidebar"),
+  sidebarToggleButton: document.querySelector("#sidebarToggleButton"),
   storageStatus: document.querySelector("#storageStatus"),
   threadCount: document.querySelector("#threadCount"),
   threadDialog: document.querySelector("#threadDialog"),
@@ -43,6 +46,20 @@ const elements = {
 };
 
 const newThreadFiles = [];
+
+function getStoredSidebarCollapsed() {
+  return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+}
+
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle("sidebar-collapsed", collapsed);
+  elements.sidebar.hidden = collapsed;
+  elements.sidebarToggleButton.setAttribute("aria-expanded", String(!collapsed));
+  const label = collapsed ? "Show sidebar" : "Hide sidebar";
+  elements.sidebarToggleButton.setAttribute("aria-label", label);
+  elements.sidebarToggleButton.title = label;
+  localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(collapsed));
+}
 
 function createId() {
   if (crypto.randomUUID) {
@@ -887,6 +904,11 @@ function openNewThreadDialog() {
 }
 
 function bindEvents() {
+  setSidebarCollapsed(getStoredSidebarCollapsed());
+  elements.sidebarToggleButton.addEventListener("click", () => {
+    setSidebarCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+  });
+
   const saveProfileName = () => {
     const name = elements.profileNameInput.value.trim();
     elements.profileTitle.hidden = false;
